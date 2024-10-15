@@ -1,6 +1,8 @@
-import express, { query } from "express";
+import express from "express";
 
 const app = express();
+
+app.use(express.json());
 
 const PORT = process.env.PORT || 3000;
 
@@ -42,6 +44,24 @@ const mockUsers = [
   },
 ];
 
+const mockProducts = [
+  {
+    id: 1,
+    name: "chicken",
+    price: "14.99",
+  },
+  {
+    id: 2,
+    name: "beef",
+    price: "18.99",
+  },
+  {
+    id: 3,
+    name: "eggs",
+    price: "6.99",
+  },
+];
+
 app.get("/", (req, res) => {
   res.send({ msg: "Hello World <3" });
 });
@@ -56,6 +76,17 @@ app.get("/api/users", (req, res) => {
     return res.send(mockUsers.filter((user) => user[filter].includes(value)));
 
   return res.send(mockUsers);
+});
+
+app.post("/api/users", (req, res) => {
+  console.log(req.body);
+  const { body } = req;
+  const newUser = {
+    id: mockUsers[mockUsers.length - 1].id + 1,
+    ...body,
+  };
+  mockUsers.push(newUser);
+  return res.status(201).send(newUser);
 });
 
 app.get("/api/users/:id", (req, res) => {
@@ -73,23 +104,7 @@ app.get("/api/users/:id", (req, res) => {
 });
 
 app.get("/api/products", (req, res) => {
-  res.send([
-    {
-      id: 1,
-      name: "chicken",
-      price: "14.99",
-    },
-    {
-      id: 2,
-      name: "beef",
-      price: "18.99",
-    },
-    {
-      id: 3,
-      name: "eggs",
-      price: "6.99",
-    },
-  ]);
+  res.send(mockProducts);
 });
 
 app.listen(PORT, () => {
