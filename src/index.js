@@ -1,11 +1,9 @@
 import express from "express";
-import { mockProducts } from "../utils/mockData.js";
-import userRouter from "./routes/users.js";
-
+import routes from "./routes/index.js";
 const app = express();
 
 app.use(express.json());
-app.use(userRouter);
+app.use("/api", routes);
 
 const PORT = process.env.PORT || 3000;
 
@@ -15,8 +13,4 @@ app.listen(PORT, () => {
 
 app.get("/", (req, res) => {
   res.send({ msg: "Hello World <3" });
-});
-
-app.get("/api/products", (req, res) => {
-  res.send(mockProducts);
 });

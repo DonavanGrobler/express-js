@@ -10,9 +10,7 @@ import { resolveIndexByUserId } from "../../utils/middlewares.js";
 
 const router = Router();
 
-router.get("/api/users", checkSchema(getUserValidationSchema), (req, res) => {
-  const result = validationResult(req);
-  console.log(result);
+router.get("/users", checkSchema(getUserValidationSchema), (req, res) => {
   const {
     query: { filter, value },
   } = req;
@@ -23,49 +21,53 @@ router.get("/api/users", checkSchema(getUserValidationSchema), (req, res) => {
   return res.send(mockUsers);
 });
 
-router.post(
-  "/api/users",
-  checkSchema(createUserValidationSchema),
-  (req, res) => {
-    const result = validationResult(req);
-    console.log(result);
-    if (!result.isEmpty()) {
-      return res.status(400).send({ errors: result.array() });
-    }
+router.post("/users", checkSchema(createUserValidationSchema), (req, res) => {
+  const result = validationResult(req);
 
-    const data = matchedData(req);
-
-    const newUser = {
-      id: mockUsers[mockUsers.length - 1].id + 1,
-      ...data,
-    };
-    mockUsers.push(newUser);
-    return res.status(201).send(newUser);
+  if (!result.isEmpty()) {
+    return res.status(400).send({ errors: result.array() });
   }
-);
 
-router.get("/api/users/:id", resolveIndexByUserId, (req, res) => {
+  const data = matchedData(req);
+
+  const newUser = {
+    id: mockUsers[mockUsers.length - 1].id + 1,
+    ...data,
+  };
+
+  mockUsers.push(newUser);
+
+  return res.status(201).send(newUser);
+});
+
+router.get("/users/:id", resolveIndexByUserId, (req, res) => {
   const { findUserIndex } = req;
   const findUser = mockUsers[findUserIndex];
+
   if (!findUser) {
     return res.sendStatus(404);
   }
+
   return res.send(findUser);
 });
 
-router.put("/api/users/:id", resolveIndexByUserId, (req, res) => {
+router.put("/users/:id", resolveIndexByUserId, (req, res) => {
   const { body, findUserIndex } = req;
+
   mockUsers[findUserIndex] = { id: mockUsers[findUserIndex].id, ...body };
+
   return res.sendStatus(200);
 });
 
-router.patch("/api/users/:id", resolveIndexByUserId, (req, res) => {
+router.patch("/users/:id", resolveIndexByUserId, (req, res) => {
   const { body, findUserIndex } = req;
+
   mockUsers[findUserIndex] = { ...mockUsers[findUserIndex], ...body };
+
   return res.sendStatus(200);
 });
 
-router.delete("/api/users/:id", resolveIndexByUserId, (req, res) => {
+router.delete("/users/:id", resolveIndexByUserId, (req, res) => {
   const { findUserIndex } = req;
 
   mockUsers.splice(findUserIndex, 1);
