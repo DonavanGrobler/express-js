@@ -6,7 +6,10 @@ import {
   matchedData,
   checkSchema,
 } from "express-validator";
-import { createUserValidationSchema } from "../utils/validationSchemas.js";
+import {
+  createUserValidationSchema,
+  getUserValidationSchema,
+} from "../utils/validationSchemas.js";
 
 const app = express();
 
@@ -94,27 +97,18 @@ app.get("/", (req, res) => {
   res.send({ msg: "Hello World <3" });
 });
 
-app.get(
-  "/api/users",
-  query("filter")
-    .isString()
-    .notEmpty()
-    .withMessage("Should not be empty")
-    .isLength({ min: 3, max: 10 })
-    .withMessage("Should be between 3-10"),
-  (req, res) => {
-    const result = validationResult(req);
-    console.log(result);
-    const {
-      query: { filter, value },
-    } = req;
+app.get("/api/users", checkSchema(getUserValidationSchema), (req, res) => {
+  const result = validationResult(req);
+  console.log(result);
+  const {
+    query: { filter, value },
+  } = req;
 
-    if (filter && value)
-      return res.send(mockUsers.filter((user) => user[filter].includes(value)));
+  if (filter && value)
+    return res.send(mockUsers.filter((user) => user[filter].includes(value)));
 
-    return res.send(mockUsers);
-  }
-);
+  return res.send(mockUsers);
+});
 
 app.post("/api/users", checkSchema(createUserValidationSchema), (req, res) => {
   const result = validationResult(req);
